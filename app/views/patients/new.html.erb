@@ -1,0 +1,62 @@
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    function patientSubmit(event) {
+      const states = JSON.parse('<%= @states.to_json.html_safe %>');
+      const patientStateId = document.getElementById("patient_state").value;
+      const patientDateOfBirth = document.getElementById("patient_date_of_birth").value;
+      const state = states[parseInt(patientStateId) - 1];
+
+      const birthDate = dayjs(patientDateOfBirth);
+      const todaysDate = dayjs(new Date());
+      const yearsOld = todaysDate.diff(birthDate, "year");
+
+      if (yearsOld < state.minimum_age || !state.active) {
+        alert("You do not meet the minimum age requirements and/or the State selected is not active.")
+        event.preventDefault();
+      }
+    }
+    document.getElementById("patient-signup-form").addEventListener("submit", patientSubmit);
+  });
+</script>
+
+<div class="row mt-4">
+  <div class="col-12 text-center d-flex flex-row justify-content-lg-center">
+    <%= form_with model: @patient, :html => {class: "form-horizontal center", id: "patient-signup-form" } do |f| %>
+      <div class="form-group">
+        <%= f.label :full_name, "Full Name", class: "control-label" %>
+        <div class="">
+          <%= f.text_field :full_name, class: "form-control" %>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= f.label :email, "Email Address", class: "control-label" %>
+        <div class="">
+          <%= f.email_field :email, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :date_of_birth, "Date of Birth", class: "control-label" %>
+        <div class="">
+          <%= f.date_field :date_of_birth, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :state, "State", class: "control-label" %>
+        <div class="">
+          <%= f.select :state, @all_states, { id: :state }, class: "form-control form-select-lg" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :product, "Product", class: "control-label" %>
+        <div class="">
+          <%= f.select :product, @products, { id: :product }, class: "form-control form-select-lg" %>
+        </div>
+      </div>
+
+      <%= f.submit "Submit", class: "btn btn-default btn-primary" %>  
+    <% end %>
+  </div>
+</div>
